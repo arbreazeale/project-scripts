@@ -78,7 +78,7 @@ dictionary <- function(data){
         variable = names(data), 
         type = sapply(data, class),
         missing = sapply(data, function(x) sum(length(which(is.na(x))))), 
-        uniques = sapply(sapply(data, unique), length), 
+        uniques = sapply(lapply(data, unique), length), 
         description = sapply(sapply(data, function(x)attr(x, "comment")), function(x) if_else(is.null(x), "", x)),
         row.names = NULL
     )
