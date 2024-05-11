@@ -120,3 +120,30 @@ source_rmd <- function(filename) {
     outpath <- file.path(paths["logs"], outfile)
     rmarkdown::render(inpath, output_file=outpath)
 }
+
+source_rmd_chunk <- function(filename, chunk_label) {
+# function imports and executes a chunk from another .Rmd file
+# the chunk is identified using the filename and chunk label 
+# function is meant to be used for replicable code without multiple copy-paste 
+# adapted from code written by Bryan Shalloway
+# https://gist.github.com/brshallo/e963b9dca5e4e1ab12ec6348b135362e
+
+    # allow duplicate chunk labels 
+    options(knitr.duplicate.label = "allow")
+
+    # temporary file to use 
+    temp <- tempfile(fileext=".R")
+    knitr::purl(filename, output=temp, quiet=TRUE)
+    
+    # read the appropriate chunk
+    text <- readr::read_file(temp)
+    text <- purrr::map(chunk_label, ~stringr::str_extract(text, glue::glue("(## ----{var})(.|[:space:])*?(?=(## ----)|$)", var = .x))) %>% 
+        stringr::str_c(collapse = "\n")    
+
+    # write chunk to temporary R script
+    readr::write_file(text, temp)
+
+    # execute chunk
+    source(temp)
+
+}
