@@ -115,8 +115,16 @@ source_rmd <- function(filename) {
 # function is meant to be used within the "control.R" document for large projects 
 
     inpath <- file.path(paths["scripts"], filename)
-    outfile <- paste(stringr::str_replace(filename, ".Rmd", ""), as.character(Sys.time()))
-    outfile <- paste(stringr::str_replace_all(outfile, " ", "_"), ".html", sep="")
+    outfile <- paste(as.character(Sys.time()), stringr::str_replace(filename, ".Rmd", ""))
+    if (grep(":", outfile)) {
+        outfile <- sub(":", "h", outfile)
+        outfile <- sub(":", "m", outfile)
+        # outfile <- paste0(outfile, "s")
+        print(outfile)
+    }
+    outfile <- sub(" ", "_", outfile)
+    outfile <- sub(" ", "s_", outfile)
+    outfile <- paste0(outfile, ".html")
     outpath <- file.path(paths["logs"], outfile)
     rmarkdown::render(inpath, output_file=outpath)
 }
